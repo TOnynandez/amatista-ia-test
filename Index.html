@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amatista IA dental module</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+
+    <style>
+        /* ESTILOS ORIGINALES (Tech Edition Dark) */
+        :root {
+            --bg-dark: #1A0623;
+            --panel-bg: #2B0A3D;
+            --text-main: #F5F0FF;
+            --accent: #8A0BD2;
+            --accent-2: #D980F9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1800px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-left: 10px;
+            opacity: 0.7;
+        }
+
+        .status-pill {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 99px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #374151;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .status-pill span.dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: #22c55e;
+                box-shadow: 0 0 5px #22c55e;
+            }
+
+        button {
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            background: #1f2937;
+            color: #e5e7eb;
+            transition: all 0.2s;
+            border: 1px solid rgba(75, 85, 99, 0.4);
+            white-space: nowrap;
+        }
+
+            button:hover {
+                background: #374151;
+            }
+
+            button.primary {
+                background: var(--accent);
+                color: #fff;
+                border: 1px solid #4338ca;
+            }
+
+                button.primary:hover {
+                    background: #4338ca;
+                }
+
+            button.danger {
+                background: #be123c;
+                color: #fff;
+            }
+
+            button.action {
+                background: #059669;
+                color: white;
+                font-weight: bold;
+                letter-spacing: 0.5px;
+                box-shadow: 0 0 10px rgba(5, 150, 105, 0.2);
+                font-size: 12px;
+                padding: 8px 16px;
+            }
+
+                button.action:hover {
+                    background: #047857;
+                    box-shadow: 0 0 15px rgba(5, 150, 105, 0.4);
+                }
+
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            background: var(--panel-bg);
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid #374151;
+        }
+
+        .file-input {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+            .file-input input[type=file] {
+                position: absolute;
+                left: 0;
+                top: 0;
+                opacity: 0;
+                width: 100%;
+                height: 100%;
+                cursor: pointer;
+            }
+
+        .shade-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 6px;
+            border-radius: 20px;
+            border: 1px solid #374151;
+        }
+
+        .shade-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #9ca3af;
+        }
+
+            .shade-btn:hover {
+                background: rgba(255,255,255,0.05);
+                color: #fff;
+            }
+
+            .shade-btn.active {
+                background: #3730a3;
+                border-color: #6366f1;
+                color: #fff;
+                box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
+            }
+
+        .color-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .workspace {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel {
+            flex: 1;
+            background: var(--panel-bg);
+            border-radius: 12px;
+            border: 1px solid #374151;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .panel-header {
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid #374151;
+            font-weight: 500;
+            font-size: 12px;
+            color: #d1d5db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .viewport {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #1f2937 0, #0b0f19 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        canvas, #resultImage {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #resultImage {
+            display: none;
+        }
+
+        #placeholder, #loader, #errorMsg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 85%;
+        }
+
+        #loader, #errorMsg {
+            display: none;
+        }
+
+        #loader {
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #374151;
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .brush-box {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            background: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .divider {
+            width: 1px;
+            height: 20px;
+            background: #374151;
+            margin: 0 5px;
+        }
+
+        @media (max-width: 1000px) {
+            .workspace {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+
+            .panel {
+                min-height: 400px;
+            }
+        }
+
+        /* Preload de fuentes invisible */
+        .font-loader {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="font-loader" style="font-family: 'Cinzel', serif; font-weight: 700;">.</div>
+    <div class="font-loader" style="font-family: 'Playfair Display', serif; font-style: italic;">.</div>
+
+    <div class="app">
+        <div class="header">
+            <div style="display:flex; align-items:center; gap: 15px;">
+                <div>
+                    <span class="title">Amatista IA dental module</span>
+                    <span class="subtitle">BETA TEST Tony1</span>
+                </div>
+            </div>
+            <div class="status-pill"><span class="dot"></span> <span id="toolStatus">Herramienta: Encía</span></div>
+        </div>
+
+        <div class="controls-row">
+            <div style="display:flex; gap:4px;">
+                <button class="file-input">📁 Foto <input type="file" id="inputBase" accept="image/*"></button>
+                <button class="file-input">📁 Encía <input type="file" id="inputGum" accept="image/*"></button>
+                <button class="file-input">📁 Dientes <input type="file" id="inputTeeth" accept="image/*"></button>
+            </div>
+            <div class="divider"></div>
+
+            <button id="btnGum" class="primary">Encía</button>
+            <button id="btnTeeth">Dientes</button>
+            <button id="btnArch" style="display:none; font-size:10px; background:#4b5563;">Bezier</button>
+            <button id="btnLip">Labio</button>
+
+            <div id="rotateBox" class="brush-box" style="display:none; margin-left:5px; background:#1f2937;">
+                <span>🔄:</span>
+                <input type="range" id="teethRotate" min="-45" max="45" value="0" style="width: 60px;">
+            </div>
+
+            <button id="btnEraser">✏️ Pincel</button>
+            <div class="brush-box">
+                <span>Tam:</span>
+                <input type="range" id="brushSize" min="5" max="80" value="20" style="width: 50px;">
+            </div>
+
+            <div class="divider"></div>
+            <button id="btnToggleLipLine">👁️ Línea</button>
+            <button id="btnHandles">Puntos</button>
+            <button id="btnResetAll" class="danger">Reset</button>
+
+            <div style="flex:1"></div>
+
+            <div class="shade-group">
+                <span style="font-size:10px; color:#6b7280; margin-right:2px;">COLOR:</span>
+                <button class="shade-btn active" data-shade="0M1" title="Hollywood Bleach">
+                    <span class="color-dot" style="background:#fff; box-shadow:0 0 3px white;"></span> 0M1
+                </button>
+                <button class="shade-btn" data-shade="B1" title="Blanco Natural">
+                    <span class="color-dot" style="background:#fdfbf7;"></span> B1
+                </button>
+                <button class="shade-btn" data-shade="A1" title="Natural Claro">
+                    <span class="color-dot" style="background:#f4f0e6;"></span> A1
+                </button>
+                <button class="shade-btn" data-shade="A2" title="Natural Promedio">
+                    <span class="color-dot" style="background:#ebe5ce;"></span> A2
+                </button>
+            </div>
+
+            <button id="btnGenerate" class="action">✨ GENERAR</button>
+        </div>
+
+        <div class="workspace">
+            <div class="panel">
+                <div class="panel-header">
+                    <span>EDITOR</span>
+                    <span style="font-size: 11px; opacity: 0.6">Rueda: Zoom | Arrastrar: Mover</span>
+                </div>
+                <div class="viewport">
+                    <canvas id="canvas"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span>RESULTADO</span>
+                    <button id="btnDownload" style="padding: 4px 12px; font-size: 11px; display:none; background:#c4a464; color:#000; font-weight:bold; border:1px solid #fff;"></button>
+                    <button id="btnVideo" style="padding: 2px 8px; font-size: 11px; display:none; background: #e11d48; margin-left: 5px; border-color: #be123c;">🎬 Video IA</button>
+                </div>
+                <div class="viewport">
+                    <div id="placeholder">
+                        <div style="font-size: 40px; margin-bottom: 10px; opacity: 0.2;">🦷</div>
+                        <div style="color: #6b7280; font-size: 14px;">El resultado aparecerá aquí</div>
+                    </div>
+
+                    <div id="loader">
+                        <div class="spinner"></div>
+                        <div>Procesando imagen...<br><small style="opacity:0.6">Esto puede tardar unos 20 seg</small></div>
+                    </div>
+
+                    <div id="errorMsg" style="color: white; background: rgba(220,38,38,0.95); padding: 15px; border-radius: 8px; font-size:13px; text-align:left; box-shadow: 0 10px 25px rgba(0,0,0,0.5);"></div>
+
+                    <img id="resultImage" alt="Resultado Dental">
+                    <video id="resultVideo" controls style="display:none; width: 100%; height: 100%; object-fit: contain;" crossorigin="anonymous"></video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================================================================================
+        //  ÁREA DE CONFIGURACIÓN
+        // ==================================================================================
+
+        // >>> INSTRUCCIÓN: PEGA TU CÓDIGO BASE64 DEL LOGO AQUÍ <<<
+        const LOGO_BASE64 = " ";
+        const WEBHOOK_URL = 'https://tonyhernandez.app.n8n.cloud/webhook/70012ee1-a177-41c7-9914-2d08cccfec95';
+        const VIDEO_WEBHOOK_URL = 'https://tonyhernandez.app.n8n.cloud/webhook/c8fa8903-3d9c-45e4-85c7-114a4b6ea271';
+
+        // CONFIGURACIÓN DE COLORES
+        const DOWNLOAD_THEME = {
+            bg: "#FAFAFA",      // Fondo oscuro
+            frame: "#182E6F",   // MARCO BLANCO
+            text: "#EFBF04",    // LETRAS AZULES (Before/After)
+            footer: "#60a5fa"   // Pie de página azul claro
+        };
+
+        // ==================================================================================
+
+        const SHADE_PROMPTS = {
+            '0M1': "Brilliant ultra-white smile, famous hollywood star look hollywood white smile, perfectly bright teeth color shade is from vita scale 0M1 or Bleach.",
+            'B1': "Natural bright white smile, healthy and clean aesthetic, soft white tone,color shade is from vita scale B1.",
+            'A1': "Realistic attractive smile, warm natural white, authentic beauty look color shade is from vita scale A1.",
+            'A2': "Natural organic smile, slightly warm ivory tone, highly realistic portrait color shade is from vita scale A1."
+        };
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const state = {
+            baseImg: new Image(), gumImg: new Image(), teethImg: new Image(), logoImg: new Image(),
+            baseLoaded: false, gumLoaded: false, teethLoaded: false, logoLoaded: false,
+            gum: { x: 0, y: 0, scale: 1 },
+            teeth: { x: 0, y: 0, scale: 1, rotation: 0, bend: 0 },
+            isArchMode: false,
+            lip: { points: [], center: { x: 0, y: 0 } },
+            tool: 'gum', isEraser: false, brushSize: 20,
+            showLipLine: false, showHandles: false,
+            isDragging: false, dragTarget: null, activePointIndex: -1, lastMouse: { x: 0, y: 0 },
+            baseRect: { x: 0, y: 0, w: 0, h: 0 },
+            currentShade: '0M1'
+        };
+
+        let gumMaskCanvas = document.createElement('canvas');
+        let gumMaskCtx = gumMaskCanvas.getContext('2d');
+
+        function init() {
+            window.addEventListener('resize', resizeCanvas);
+            setTimeout(resizeCanvas, 100);
+            initLipPoints();
+            loadInternalLogo();
+            updateUI();
+        }
+
+        function loadInternalLogo() {
+            if (LOGO_BASE64 && LOGO_BASE64.startsWith('data:image')) {
+                state.logoImg.crossOrigin = "Anonymous";
+                state.logoImg.src = LOGO_BASE64;
+                state.logoImg.onload = () => {
+                    state.logoLoaded = true;
+                    document.getElementById('appLogo').src = LOGO_BASE64;
+                };
+            }
+        }
+
+        function resizeCanvas() {
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+            if (!state.baseLoaded) initLipPoints();
+            draw();
+        }
+
+        // ================= CARGA DE ARCHIVOS =================
+        function handleFile(e, type) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                let img;
+                if (type === 'base') img = state.baseImg;
+                else if (type === 'gum') img = state.gumImg;
+                else if (type === 'teeth') img = state.teethImg;
+
+                img.src = event.target.result;
+                img.onload = () => {
+                    if (type === 'base') { state.baseLoaded = true; fitImageToCanvas(); initLipPoints(); }
+                    if (type === 'gum') { state.gumLoaded = true; gumMaskCanvas.width = img.width; gumMaskCanvas.height = img.height; gumMaskCtx.drawImage(img, 0, 0); resetGumTransform(); }
+                    if (type === 'teeth') { state.teethLoaded = true; resetTeethTransform(); }
+                    draw();
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        ['inputBase', 'inputGum', 'inputTeeth'].forEach(id => {
+            const type = id.replace('input', '').toLowerCase();
+            document.getElementById(id).onchange = (e) => handleFile(e, type);
+        });
+
+        function fitImageToCanvas() {
+            if (!state.baseLoaded) return;
+            const ratio = Math.min(canvas.width / state.baseImg.width, canvas.height / state.baseImg.height);
+            const w = state.baseImg.width * ratio; const h = state.baseImg.height * ratio;
+            state.baseRect = { x: (canvas.width - w) / 2, y: (canvas.height - h) / 2, w, h, ratio };
+        }
+
+        function resetGumTransform() {
+            if (!state.gumLoaded || !state.baseLoaded) return;
+            const targetW = state.baseRect.w * 0.5; const scale = targetW / state.gumImg.width;
+            state.gum = { scale, x: state.baseRect.x + (state.baseRect.w - targetW) / 2, y: state.baseRect.y + state.baseRect.h * 0.4 };
+        }
+        function resetTeethTransform() {
+            if (!state.teethLoaded || !state.baseLoaded) return;
+            const targetW = state.baseRect.w * 0.45; const scale = targetW / state.teethImg.width;
+            state.teeth = { scale, x: state.baseRect.x + (state.baseRect.w - targetW) / 2, y: state.baseRect.y + state.baseRect.h * 0.45, rotation: 0, bend: 0 };
+        }
+
+        function initLipPoints() {
+            const cx = canvas.width / 2; const cy = canvas.height * 0.55;
+            const w = canvas.width * 0.15; const h = canvas.height * 0.08;
+            state.lip.center = { x: cx, y: cy }; state.lip.points = [];
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * Math.PI * 2;
+                state.lip.points.push({ x: cx + Math.cos(angle) * w, y: cy + Math.sin(angle) * h });
+            }
+        }
+
+        function drawWarpedTeeth(ctx, img, x, y, scale, rotation, bend) {
+            if (!img) return;
+            const w = img.width * scale; const h = img.height * scale;
+            const slices = 30; const sliceW = w / slices; const imgSliceW = img.width / slices;
+            ctx.save(); ctx.translate(x, y); ctx.rotate(rotation * Math.PI / 180);
+            for (let i = 0; i < slices; i++) {
+                const normX = (i / (slices - 1)) * 2 - 1;
+                const yOffset = Math.pow(normX, 2) * bend * scale;
+                ctx.drawImage(img, i * imgSliceW, 0, imgSliceW, img.height, (i * sliceW) - (w / 2), -(h / 2) + yOffset, sliceW, h);
+            }
+            if (state.tool === 'teeth' && state.isArchMode) {
+                ctx.fillStyle = '#00ff00'; ctx.beginPath(); ctx.arc(0, (h / 2), 6, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!state.baseLoaded) {
+                ctx.fillStyle = "#374151"; ctx.font = "13px sans-serif"; ctx.textAlign = "center";
+                ctx.fillText("1. Carga Foto  |  2. Ajusta Dientes/Encía  |  3. Define Labios  |  4. Generar", canvas.width / 2, canvas.height / 2); return;
+            }
+            fitImageToCanvas();
+            ctx.drawImage(state.baseImg, state.baseRect.x, state.baseRect.y, state.baseRect.w, state.baseRect.h);
+
+            if (state.teethLoaded) drawWarpedTeeth(ctx, state.teethImg, state.teeth.x, state.teeth.y, state.teeth.scale, state.teeth.rotation, state.teeth.bend);
+            if (state.gumLoaded) {
+                ctx.save(); ctx.translate(state.gum.x, state.gum.y); ctx.scale(state.gum.scale, state.gum.scale);
+                ctx.drawImage(gumMaskCanvas, 0, 0); ctx.restore();
+            }
+
+            if (state.lip.points.length > 0) {
+                ctx.beginPath(); const pts = state.lip.points; ctx.moveTo(pts[0].x, pts[0].y);
+                for (let i = 1; i < pts.length; i++) {
+                    const xc = (pts[i - 1].x + pts[i].x) / 2; const yc = (pts[i - 1].y + pts[i].y) / 2;
+                    ctx.quadraticCurveTo(pts[i - 1].x, pts[i - 1].y, xc, yc);
+                }
+                const xc = (pts[pts.length - 1].x + pts[0].x) / 2; const yc = (pts[pts.length - 1].y + pts[0].y) / 2;
+                ctx.quadraticCurveTo(pts[pts.length - 1].x, pts[pts.length - 1].y, xc, yc);
+                ctx.closePath();
+                ctx.save(); ctx.clip();
+                ctx.drawImage(state.baseImg, state.baseRect.x, state.baseRect.y, state.baseRect.w, state.baseRect.h);
+                ctx.restore();
+
+                if (state.showLipLine) { ctx.strokeStyle = 'rgba(255, 50, 50, 0.8)'; ctx.lineWidth = 1.5; ctx.stroke(); }
+                if (state.showHandles && state.tool === 'lip') {
+                    ctx.fillStyle = '#4f46e5'; for (let p of pts) { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill(); }
+                    ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(state.lip.center.x, state.lip.center.y, 5, 0, Math.PI * 2); ctx.fill();
+                }
+            }
+        }
+
+        // ================= INTERACCIÓN MOUSE =================
+        canvas.addEventListener('mousedown', (e) => {
+            if (!state.baseLoaded) return;
+            const rect = canvas.getBoundingClientRect(); const mx = e.clientX - rect.left; const my = e.clientY - rect.top;
+            state.lastMouse = { x: mx, y: my }; state.isDragging = true;
+            if (state.tool === 'lip') {
+                if (Math.hypot(mx - state.lip.center.x, my - state.lip.center.y) < 15) { state.dragTarget = 'lip-center'; return; }
+                for (let i = 0; i < state.lip.points.length; i++) { if (Math.hypot(mx - state.lip.points[i].x, my - state.lip.points[i].y) < 10) { state.activePointIndex = i; state.dragTarget = 'lip-point'; return; } }
+            } else if (state.tool === 'gum') {
+                if (state.isEraser) { state.dragTarget = 'eraser'; eraseGum(mx, my); } else state.dragTarget = 'gum';
+            } else if (state.tool === 'teeth') { state.dragTarget = state.isArchMode ? 'teeth-bend' : 'teeth'; }
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            if (!state.isDragging) return;
+            const rect = canvas.getBoundingClientRect(); const mx = e.clientX - rect.left; const my = e.clientY - rect.top;
+            const dx = mx - state.lastMouse.x; const dy = my - state.lastMouse.y;
+            if (state.dragTarget === 'gum') { state.gum.x += dx; state.gum.y += dy; }
+            else if (state.dragTarget === 'teeth') { state.teeth.x += dx; state.teeth.y += dy; }
+            else if (state.dragTarget === 'teeth-bend') { state.teeth.bend += dy * 0.5; }
+            else if (state.dragTarget === 'eraser') eraseGum(mx, my);
+            else if (state.dragTarget === 'lip-center') { state.lip.center.x += dx; state.lip.center.y += dy; state.lip.points.forEach(p => { p.x += dx; p.y += dy; }); }
+            else if (state.dragTarget === 'lip-point') { state.lip.points[state.activePointIndex].x += dx; state.lip.points[state.activePointIndex].y += dy; }
+            state.lastMouse = { x: mx, y: my }; draw();
+        });
+        canvas.addEventListener('mouseup', () => { state.isDragging = false; state.dragTarget = null; });
+        canvas.addEventListener('wheel', (e) => {
+            if (!state.baseLoaded) return; e.preventDefault(); const factor = e.deltaY > 0 ? 0.95 : 1.05;
+            if (state.tool === 'gum' && !state.isEraser) state.gum.scale *= factor;
+            else if (state.tool === 'teeth') state.teeth.scale *= factor;
+            draw();
+        }, { passive: false });
+
+        function eraseGum(mx, my) {
+            if (!state.gumLoaded) return;
+            const ix = (mx - state.gum.x) / state.gum.scale; const iy = (my - state.gum.y) / state.gum.scale; const r = state.brushSize / state.gum.scale;
+            gumMaskCtx.save(); gumMaskCtx.globalCompositeOperation = 'destination-out';
+            gumMaskCtx.beginPath(); gumMaskCtx.arc(ix, iy, r, 0, Math.PI * 2); gumMaskCtx.fill(); gumMaskCtx.restore();
+            draw();
+        }
+
+        // ================= UI & SELECTOR =================
+        function updateUI() {
+            ['btnGum', 'btnTeeth', 'btnLip'].forEach(id => document.getElementById(id).classList.remove('primary'));
+            document.getElementById('btnArch').style.display = 'none'; document.getElementById('rotateBox').style.display = 'none'; document.getElementById('btnEraser').style.display = 'none'; document.querySelector('.brush-box').style.display = 'none';
+            if (state.tool === 'gum') { document.getElementById('btnGum').classList.add('primary'); document.getElementById('toolStatus').innerText = 'Herramienta: Encía'; document.getElementById('btnEraser').style.display = 'inline-block'; document.querySelector('.brush-box').style.display = 'flex'; }
+            else if (state.tool === 'teeth') { document.getElementById('btnTeeth').classList.add('primary'); document.getElementById('toolStatus').innerText = 'Herramienta: Dientes'; document.getElementById('btnArch').style.display = 'inline-block'; document.getElementById('rotateBox').style.display = 'flex'; document.getElementById('btnArch').style.background = state.isArchMode ? '#059669' : '#4b5563'; }
+            else if (state.tool === 'lip') { document.getElementById('btnLip').classList.add('primary'); document.getElementById('toolStatus').innerText = 'Herramienta: Labio'; }
+        }
+        document.getElementById('btnGum').onclick = () => { state.tool = 'gum'; state.isEraser = false; updateUI(); };
+        document.getElementById('btnTeeth').onclick = () => { state.tool = 'teeth'; updateUI(); };
+        document.getElementById('btnLip').onclick = () => { state.tool = 'lip'; updateUI(); };
+        document.getElementById('btnArch').onclick = () => { state.isArchMode = !state.isArchMode; updateUI(); draw(); };
+        document.getElementById('teethRotate').oninput = (e) => { state.teeth.rotation = parseInt(e.target.value); draw(); };
+        const btnEraser = document.getElementById('btnEraser');
+        btnEraser.onclick = () => { state.isEraser = !state.isEraser; btnEraser.style.background = state.isEraser ? '#be123c' : ''; btnEraser.innerText = state.isEraser ? '🛑 Parar' : '✏️ Pincel'; };
+        document.getElementById('brushSize').oninput = (e) => state.brushSize = parseInt(e.target.value);
+        const btnToggleLip = document.getElementById('btnToggleLipLine');
+        btnToggleLip.onclick = () => { state.showLipLine = !state.showLipLine; btnToggleLip.style.opacity = state.showLipLine ? '1' : '0.5'; draw(); };
+        const btnHandles = document.getElementById('btnHandles');
+        btnHandles.onclick = () => { state.showHandles = !state.showHandles; btnHandles.style.opacity = state.showHandles ? '1' : '0.5'; draw(); };
+        document.getElementById('btnResetAll').onclick = () => { if (confirm('¿Reiniciar todo?')) { resetGumTransform(); resetTeethTransform(); initLipPoints(); if (state.gumLoaded) { gumMaskCtx.clearRect(0, 0, gumMaskCanvas.width, gumMaskCanvas.height); gumMaskCtx.drawImage(state.gumImg, 0, 0); } document.getElementById('resultImage').style.display = 'none'; document.getElementById('placeholder').style.display = 'block'; document.getElementById('btnDownload').style.display = 'none'; state.isEraser = false; updateUI(); draw(); } };
+        const shadeButtons = document.querySelectorAll('.shade-btn');
+        shadeButtons.forEach(btn => { btn.addEventListener('click', () => { shadeButtons.forEach(b => b.classList.remove('active')); btn.classList.add('active'); state.currentShade = btn.getAttribute('data-shade'); }); });
+
+        // ================= GENERACIÓN =================
+        function renderForAI() {
+            if (!state.baseLoaded) return null;
+            const targetW = 1024; const scale = targetW / state.baseImg.width; const targetH = state.baseImg.height * scale;
+            const off = document.createElement('canvas'); off.width = targetW; off.height = targetH;
+            const octx = off.getContext('2d');
+            octx.drawImage(state.baseImg, 0, 0, targetW, targetH);
+            const k = scale / state.baseRect.ratio; function tx(val, offset) { return (val - offset) * k; }
+
+            if (state.teethLoaded) {
+                const t = state.teeth; const s = t.scale * k;
+                const img = state.teethImg; const w = img.width * s; const h = img.height * s;
+                const slices = 30; const sliceW = w / slices; const imgSliceW = img.width / slices;
+                octx.save(); octx.translate(tx(t.x, state.baseRect.x), tx(t.y, state.baseRect.y)); octx.rotate(t.rotation * Math.PI / 180);
+                for (let i = 0; i < slices; i++) { const normX = (i / (slices - 1)) * 2 - 1; const yOffset = Math.pow(normX, 2) * t.bend * s; octx.drawImage(img, i * imgSliceW, 0, imgSliceW, img.height, (i * sliceW) - (w / 2), -(h / 2) + yOffset, sliceW, h); }
+                octx.restore();
+            }
+            if (state.gumLoaded) { octx.save(); octx.translate(tx(state.gum.x, state.baseRect.x), tx(state.gum.y, state.baseRect.y)); const s = state.gum.scale * k; octx.scale(s, s); octx.drawImage(gumMaskCanvas, 0, 0); octx.restore(); }
+            if (state.lip.points.length > 0) {
+                octx.save(); octx.beginPath(); const pts = state.lip.points; octx.moveTo(tx(pts[0].x, state.baseRect.x), tx(pts[0].y, state.baseRect.y));
+                for (let i = 1; i < pts.length; i++) { const xc = (tx(pts[i - 1].x, state.baseRect.x) + tx(pts[i].x, state.baseRect.x)) / 2; const yc = (tx(pts[i - 1].y, state.baseRect.y) + tx(pts[i].y, state.baseRect.y)) / 2; octx.quadraticCurveTo(tx(pts[i - 1].x, state.baseRect.x), tx(pts[i - 1].y, state.baseRect.y), xc, yc); }
+                const xc = (tx(pts[pts.length - 1].x, state.baseRect.x) + tx(pts[0].x, state.baseRect.x)) / 2; const yc = (tx(pts[pts.length - 1].y, state.baseRect.y) + tx(pts[0].y, state.baseRect.y)) / 2;
+                octx.quadraticCurveTo(tx(pts[pts.length - 1].x, state.baseRect.x), tx(pts[pts.length - 1].y, state.baseRect.y), xc, yc);
+                octx.closePath(); octx.clip(); octx.drawImage(state.baseImg, 0, 0, targetW, targetH); octx.restore();
+            }
+            return off.toDataURL('image/jpeg', 0.85);
+        }
+
+        // ================= FUNCIONES DE CARGA Y PROCESAMIENTO (FINAL) =================
+
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = (e) => reject(new Error("No se pudo cargar la imagen."));
+                img.src = src;
+            });
+        }
+
+        async function generateComparisonImage(originalSrc, resultSrc) {
+            try {
+                const [imgBefore, imgAfter] = await Promise.all([
+                    loadImage(originalSrc),
+                    loadImage(resultSrc)
+                ]);
+
+                const targetW = imgAfter.width;
+                const targetH = imgAfter.height;
+
+                // Definir el radio de las esquinas redondeadas
+                const cornerRadius = 16; // Puedes ajustar este valor
+
+                const gap = 20; const padding = 40; const headerH = 120; const footerH = 60;
+                const totalW = (targetW * 2) + gap + (padding * 2);
+                const totalH = targetH + headerH + footerH + (padding * 2);
+
+                const compCanvas = document.createElement('canvas');
+                compCanvas.width = totalW; compCanvas.height = totalH;
+                const c = compCanvas.getContext('2d');
+
+                // 1. Fondo y Marco Exterior (Redondeado)
+                c.fillStyle = DOWNLOAD_THEME.bg; c.fillRect(0, 0, totalW, totalH);
+                c.strokeStyle = DOWNLOAD_THEME.frame; c.lineWidth = 10;
+
+                // Usar roundRect para el borde exterior
+                c.beginPath();
+                c.roundRect(10, 10, totalW - 20, totalH - 20, cornerRadius);
+                c.stroke();
+
+                // 2. Logo (Centrado)
+                if (state.logoLoaded && state.logoImg.naturalWidth > 0) {
+                    const logoH_target = 300;
+                    const ratio = state.logoImg.width / state.logoImg.height;
+                    const logoW_target = logoH_target * ratio;
+                    c.drawImage(state.logoImg, (totalW - logoW_target) / 2, -60, logoW_target, logoH_target);
+                } else {
+                    // Fallback texto
+                    c.fillStyle = DOWNLOAD_THEME.text; c.font = "bold 40px Serif"; c.textAlign = "center";
+                    c.fillText("AMATISTA", totalW / 2, 80);
+                }
+
+                const yPos = headerH + padding;
+                const xBefore = padding;
+                const xAfter = padding + targetW + gap;
+
+                // Función Aspect Fill con Recorte Redondeado
+                function drawAspectFill(ctx, img, x, y, w, h) {
+                    ctx.save();
+                    // Crear la ruta de recorte redondeada
+                    ctx.beginPath();
+                    ctx.roundRect(x, y, w, h, cornerRadius);
+                    ctx.clip();
+
+                    const scale = Math.max(w / img.width, h / img.height);
+                    const newW = img.width * scale; const newH = img.height * scale;
+                    const offsetX = x + (w - newW) / 2; const offsetY = y + (h - newH) / 2;
+                    ctx.drawImage(img, offsetX, offsetY, newW, newH);
+                    ctx.restore();
+                }
+
+                // Dibujar Imágenes (con recorte redondeado)
+                drawAspectFill(c, imgBefore, xBefore, yPos, targetW, targetH);
+                // Para la imagen "After", como ya tiene el tamaño correcto, solo necesitamos el clip
+                c.save();
+                c.beginPath();
+                c.roundRect(xAfter, yPos, targetW, targetH, cornerRadius);
+                c.clip();
+                c.drawImage(imgAfter, xAfter, yPos, targetW, targetH);
+                c.restore();
+
+
+                // Bordes Internos (Redondeados)
+                c.strokeStyle = DOWNLOAD_THEME.frame; c.lineWidth = 10;
+
+                c.beginPath();
+                c.roundRect(xBefore, yPos, targetW, targetH, cornerRadius);
+                c.stroke();
+
+                c.beginPath();
+                c.roundRect(xAfter, yPos, targetW, targetH, cornerRadius);
+                c.stroke();
+
+                // Textos (Fuente Cinzel)
+                c.fillStyle = DOWNLOAD_THEME.text;
+                c.font = "700 30px 'Cinzel', serif";
+                c.textAlign = "center";
+                c.letterSpacing = "4px";
+
+                const textY = yPos + targetH + 50;
+                c.fillText("BEFORE", xBefore + (targetW / 2), textY);
+                c.fillText("AFTER", xAfter + (targetW / 2), textY);
+
+                // Marca de agua (Playfair Display)
+                c.fillStyle = DOWNLOAD_THEME.footer;
+                c.font = "italic 25px 'Playfair Display', serif";
+                c.letterSpacing = "1px";
+                c.fillText("", totalW / 2, totalH - 50);
+
+                return compCanvas.toDataURL('image/jpeg', 1);
+
+            } catch (error) {
+                console.error("Fallo al generar marco:", error);
+                throw error;
+            }
+        }
+
+        // --- BOTÓN GENERAR ---
+        const btnGenerate = document.getElementById('btnGenerate');
+        const loader = document.getElementById('loader'); const resultImage = document.getElementById('resultImage');
+        const placeholder = document.getElementById('placeholder'); const errorMsg = document.getElementById('errorMsg');
+        const btnDownload = document.getElementById('btnDownload');
+
+        btnGenerate.addEventListener('click', async () => {
+            if (!state.baseLoaded) { alert("¡Carga una foto primero!"); return; }
+            placeholder.style.display = 'none'; resultImage.style.display = 'none'; errorMsg.style.display = 'none'; btnDownload.style.display = 'none';
+            loader.style.display = 'block'; errorMsg.innerHTML = "";
+
+            try {
+                const base64 = renderForAI();
+                const shadeInstruction = SHADE_PROMPTS[state.currentShade];
+                let fullPrompt = `High-end digital dental retouching. CRITICAL INSTRUCTION: PRESERVE THE EXACT ORIGINAL IDENTITY AND FACIAL FEATURES. Teeth Color/Shade: ${shadeInstruction} Texture: Hyper-realistic porcelain veneers with natural translucency. Do not change the skin texture, nose, lips, or face shape. Maintain the original image framing. TASK: Replace only the existing teeth with a perfect, premium smile design.`;
+                fullPrompt = fullPrompt.replace(/[\r\n]+/g, " ");
+
+                const resp = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64, prompt_video: fullPrompt })
+                });
+
+                if (!resp.ok) throw new Error(`Error del Servidor: ${resp.status}`);
+                const responseText = await resp.text();
+                let data; try { data = JSON.parse(responseText); } catch (e) { throw new Error("Error leyendo JSON"); }
+
+                let imgData = null;
+                if (data.image) imgData = data.image; else if (data.output) imgData = data.output; else if (data.data) imgData = data.data; else if (Array.isArray(data) && data[0]) imgData = data[0].image || data[0].output;
+
+                if (imgData) {
+                    let src = imgData.startsWith('data:') ? imgData : `data:image/png;base64,${imgData}`;
+                    resultImage.src = src;
+                    resultImage.style.display = 'block';
+                    btnDownload.style.display = 'inline-block';
+                    document.getElementById('btnVideo').style.display = 'inline-block';
+
+                    // Lógica de Descarga con Nombre Personalizado
+                    btnDownload.onclick = async () => {
+                        let customName = prompt("Nombre del Paciente / Archivo:", "Amatista_Paciente");
+
+                        if (customName === null) return;
+                        if (customName.trim() === "") customName = "Amatista_SinNombre";
+
+                        customName = customName.replace(/[^a-z0-9áéíóúñ_\-\s]/gi, '_');
+
+                        const originalText = btnDownload.innerText;
+                        btnDownload.innerText = "⏳ Procesando...";
+                        btnDownload.disabled = false;
+
+                        try {
+                            const compBase64 = await generateComparisonImage(state.baseImg.src, src);
+                            const a = document.createElement('a');
+                            a.href = compBase64;
+                            a.download = `${customName}_${state.currentShade}.jpg`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                        } catch (e) {
+                            console.error(e);
+                            alert("Error al crear imagen comparativa. Intente de nuevo.");
+                        } finally {
+                            btnDownload.innerText = originalText;
+                            btnDownload.disabled = false;
+                        }
+                    };
+                } else throw new Error("No encontré la imagen en la respuesta.");
+
+            } catch (e) { console.error(e); errorMsg.style.display = 'block'; errorMsg.innerHTML = `<strong>ERROR:</strong> ${e.message}`; }
+            finally { loader.style.display = 'none'; }
+        });
+
+        // ================= GENERACIÓN DE VIDEO =================
+        const btnVideo = document.getElementById('btnVideo');
+        const vidElement = document.getElementById('resultVideo');
+        const imgElement = document.getElementById('resultImage');
+        function findDeepUrl(obj) { if (!obj) return null; if (typeof obj === 'string' && (obj.startsWith('http') || obj.startsWith('blob:'))) return obj; if (typeof obj === 'object') { for (let key in obj) { const found = findDeepUrl(obj[key]); if (found) return found; } } return null; }
+
+        btnVideo.addEventListener('click', async () => {
+            if (!imgElement.src || imgElement.style.display === 'none') { alert("Primero genera una imagen."); return; }
+            btnVideo.innerText = "⏳ Creando..."; btnVideo.disabled = true; btnVideo.style.opacity = "0.7";
+            try {
+                const base64Clean = imgElement.src.split(',')[1];
+                const response = await fetch(VIDEO_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: base64Clean, filename: "dental_fix.jpg" }) });
+                if (!response.ok) throw new Error(`Error ${response.status}`);
+                const data = await response.json(); const videoUrl = findDeepUrl(data);
+                if (videoUrl) { imgElement.style.display = 'none'; vidElement.style.display = 'block'; vidElement.src = videoUrl; vidElement.load(); btnVideo.innerText = "✅ Video Listo"; } else throw new Error("No URL video");
+            } catch (error) { console.error(error); alert("Error: " + error.message); btnVideo.innerText = "Reintentar"; }
+            finally { btnVideo.disabled = false; btnVideo.style.opacity = "1"; }
+        });
+
+        init();
+    </script>
+</body>
+</html>
